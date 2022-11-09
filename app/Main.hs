@@ -37,7 +37,7 @@ display = do
      mapM_ (\(x, y, z) -> vertex $ Vertex3 x y z) (validPoints pointsList)
   flush
 
-
+--test
 
 {-
 
