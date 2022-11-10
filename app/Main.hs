@@ -3,7 +3,7 @@ module Main where
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
-maxIter = 100
+maxIter = 20
 
 pointsAsVertexes = mapM_ (\(x,y,z)->vertex$Vertex3 x y z)
 
@@ -15,10 +15,26 @@ iterCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> GLf
 iterCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = iterCount (x0, y0, z0) (x*x - y*y + x0) (2*x*y + y0) (iter + 1)
                          | otherwise = iter
 
+----worst way to generate two lists----
+
 validPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
 validPoints lst = filter (\x -> iterCount x 0 0 0 == maxIter) lst
 
+invalidPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
+invalidPoints lst = filter (\x -> iterCount x 0 0 0 /= maxIter) lst
+
 mandlebrotLst = validPoints pointsList
+notMandlebrotLst = invalidPoints pointsList
+
+
+iterList :: [(GLfloat, GLfloat, GLfloat)] -> [GLfloat]
+iterList x = [ iterCount y 0 0 0 | y <- x ]
+
+--
+
+--validPointsTest :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat, Color3 GLfloat)]
+--validPointsTest lst = [ | x <- lst]  
+
 
 
 main :: IO ()
@@ -42,6 +58,12 @@ display = do
      pointsAsVertexes mandlebrotLst
   flush
 
+--HSVtoRGB :: GLfloat -> Color3 GFloat
+--HSVtoRGB x | x == 0 = Color3 0 0 0
+
+
+-- idea --
+--zip list of valid with their iter
 
 {-
 
