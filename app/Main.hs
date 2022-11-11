@@ -3,9 +3,13 @@ module Main where
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
-maxIter = 1000s
+maxIter = 1000
 
-s1 = 200
+s1 = 300
+wSize = Size 300 300
+
+c1 = 0
+c2 = 0
 
 pointsAsVertexes = mapM_ (\(x,y,z)->vertex$Vertex3 x y z)
 
@@ -14,22 +18,24 @@ pointsList = [((x/(s1/2)),(y/(s1/2)),0) | x <- [-(s1/2)..(s1/2)], y <- [-(s1/2).
 
 
 iterCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> GLfloat
-iterCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = iterCount (x0, y0, z0) (x*x - y*y + x0) (2*x*y + y0) (iter + 1)
+iterCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = iterCount (x0, y0, z0) (x*x - y*y + x0 -0.5) (2*x*y + y0) (iter + 1)
                          | otherwise = iter
 
-----worst way imaginable to generate two lists----
+----worst way imaginable to generate lists----
 
-validPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
-validPoints lst = filter (\x -> iterCount x 0 0 0 == maxIter) lst
+--validPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
+--validPoints lst = filter (\x -> iterCount x 0 0 0 == maxIter) lst
 
 invalidPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
-invalidPoints lst = filter (\x -> iterCount x 0 0 0 /= maxIter) lst
+invalidPoints lst = filter (\x -> iterCount x c1 c2 0 /= maxIter) lst
 
-mandlebrotLst = validPoints pointsList
+--mandlebrotLst = validPoints pointsList
 notMandlebrotLst = invalidPoints pointsList
 
+--colouring i made up random numbers for it--
+
 plotColour :: (GLfloat, GLfloat, GLfloat) -> IO ()
-plotColour pnt = plot (iterCount pnt 0 0 0)
+plotColour pnt = plot (iterCount pnt c1 c2 0)
               where 
               plot :: GLfloat -> IO ()
               plot x = do
@@ -41,12 +47,12 @@ main :: IO ()
 main = do
   (_progName, _args) <- getArgsAndInitialize
   window "test"
-  clearColor $= Color4 1 1 1 1
+  clearColor $= Color4 0 0 0 1
   mainLoop
 
 window name = do
   createWindow name 
-  windowSize $= Size 200 200
+  windowSize $= wSize
   displayCallback $= clear [ColorBuffer]
   displayCallback $= display
 
@@ -54,9 +60,6 @@ display :: DisplayCallback
 display = do
   clear [ ColorBuffer ]
   currentColor $= Color4 0 0 0 1
-  
-  renderPrimitive Points $
-    pointsAsVertexes mandlebrotLst
   repeatNtimes (length notMandlebrotLst) 0
   flush
 
@@ -66,6 +69,12 @@ repeatNtimes 0 x = return ()
 repeatNtimes iter x = do
    plotColour (notMandlebrotLst !! x)
    repeatNtimes (iter-1) (x+1)
+
+--generate HSV---
+
+---HSV to RGB---
+
+
 
 ----REFERENCES----
 {-
