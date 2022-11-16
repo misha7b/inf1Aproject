@@ -23,23 +23,14 @@ pointsList :: [(GLfloat, GLfloat, GLfloat)]
 pointsList = [((x/(s/2)),(y/(s/2)),0) | x <- [-(s/2)..(s/2)], y <- [-(s/2)..(s/2)]]
 
 
-iterCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> GLfloat
-iterCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = iterCount (x0, y0, z0) (x*x - y*y + x0 -0.5) (2*x*y + y0) (iter + 1)
+mandlebrotCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> GLfloat
+mandlebrotCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = mandlebrotCount (x0, y0, z0) (x*x - y*y + x0 -0.5) (2*x*y + y0) (iter + 1)
                          | otherwise = iter
 
---validPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
---validPoints lst = filter (\x -> iterCount x 0 0 0 == maxIter) lst
-
---invalidPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
---invalidPoints lst = filter (\x -> iterCount x c1 c2 0 /= maxIter) lst
-
---mandlebrotLst = validPoints pointsList
---notMandlebrotLst = invalidPoints pointsList
-
---colouring i made up random numbers for it--
+--colours points in the that go to infinity black and other 
 
 plotColour :: (GLfloat, GLfloat, GLfloat) -> IO ()
-plotColour pnt = plot (iterCount pnt c1 c2 0)
+plotColour pnt = plot (mandlebrotCount pnt c1 c2 0)
               where 
               plot :: GLfloat -> IO ()
               plot x = do
