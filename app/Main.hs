@@ -3,34 +3,38 @@ module Main where
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 
+
+
+
 maxIter = 1000
 
-s1 = 300
+s = 300
 wSize = Size 300 300
 
 c1 = 0
 c2 = 0
 
-pointsAsVertexes = mapM_ (\(x,y,z)->vertex$Vertex3 x y z)
+--pointsAsVertexes = mapM_ (\(x,y,z)->vertex$Vertex3 x y z)
+
+vertex3f :: (GLfloat, GLfloat, GLfloat) -> IO ()
+vertex3f (x, y, z) = vertex $ Vertex3 x y z
 
 pointsList :: [(GLfloat, GLfloat, GLfloat)]
-pointsList = [((x/(s1/2)),(y/(s1/2)),0) | x <- [-(s1/2)..(s1/2)], y <- [-(s1/2)..(s1/2)]]
+pointsList = [((x/(s/2)),(y/(s/2)),0) | x <- [-(s/2)..(s/2)], y <- [-(s/2)..(s/2)]]
 
 
 iterCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> GLfloat
 iterCount (x0, y0, z0) x y iter | x*x + y*y <= 2*2 && iter < maxIter = iterCount (x0, y0, z0) (x*x - y*y + x0 -0.5) (2*x*y + y0) (iter + 1)
                          | otherwise = iter
 
-----worst way imaginable to generate lists----
-
 --validPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
 --validPoints lst = filter (\x -> iterCount x 0 0 0 == maxIter) lst
 
-invalidPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
-invalidPoints lst = filter (\x -> iterCount x c1 c2 0 /= maxIter) lst
+--invalidPoints :: [(GLfloat, GLfloat, GLfloat)] -> [(GLfloat, GLfloat, GLfloat)]
+--invalidPoints lst = filter (\x -> iterCount x c1 c2 0 /= maxIter) lst
 
 --mandlebrotLst = validPoints pointsList
-notMandlebrotLst = invalidPoints pointsList
+--notMandlebrotLst = invalidPoints pointsList
 
 --colouring i made up random numbers for it--
 
@@ -39,10 +43,16 @@ plotColour pnt = plot (iterCount pnt c1 c2 0)
               where 
               plot :: GLfloat -> IO ()
               plot x = do
-                currentColor $= Color4 (x/100) (2*x/100) (3*x/100) 1
-                renderPrimitive Points $
-                  pointsAsVertexes [pnt]
-
+                let action |x == maxIter = do
+                                currentColor $= Color4 0 0 0 1
+                                renderPrimitive Points $
+                                  vertex3f pnt
+                            |otherwise = do
+                                currentColor $= Color4 (2*x/100) (2*x/100) (1*x/100) 1
+                                renderPrimitive Points $
+                                  vertex3f pnt 
+                action            
+               
 main :: IO ()
 main = do
   (_progName, _args) <- getArgsAndInitialize
@@ -60,19 +70,24 @@ display :: DisplayCallback
 display = do
   clear [ ColorBuffer ]
   currentColor $= Color4 0 0 0 1
-  repeatNtimes (length notMandlebrotLst) 0
+  repeatNtimes (length pointsList) 0
   flush
 
 --not a loop--
 
 repeatNtimes 0 x = return ()
 repeatNtimes iter x = do
-   plotColour (notMandlebrotLst !! x)
+   plotColour (pointsList !! x)
    repeatNtimes (iter-1) (x+1)
+
+
+
 
 --generate HSV---
 
 ---HSV to RGB---
+
+---orthographic projection---
 
 
 
