@@ -13,7 +13,7 @@ wSize = Size 300 300
 pallateSize = 50
 
 genPallate :: GLfloat -> [(GLfloat, GLfloat, GLfloat)]
-genPallate n = [((x*360/n),0.5,0.5) | x<- [0..n]]
+genPallate n = [((x*360/n),1,1) | x<- [0..n]]
 
 hsvPallate = genPallate pallateSize
 
@@ -57,11 +57,11 @@ juliaCount (x0, y0, z0) x y iter | x0 * x0 + y0 * y0 <= 2*2 && iter < maxIter = 
 
 -- chooses the function to plot and the starting values
 
-fn = mandlebrotCount
-c1 = 0
-c2 = 0
---c1 = -0.79
---c2 = 0.15
+fn = juliaCount
+--c1 = 0
+--c2 = 0
+c1 = -0.79
+c2 = 0.15
 
 
 --colours points in the that go to infinity black and other 
@@ -96,7 +96,6 @@ main = do
   (_progName, _args) <- getArgsAndInitialize
   window "test"
   clearColor $= Color4 0 0 0 1
-  print(hsvToRGB (120,1,1) )
   mainLoop
 
 window name = do
