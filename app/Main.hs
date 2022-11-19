@@ -5,24 +5,26 @@ import Graphics.UI.GLUT
 import Data.Fixed
 
 
-maxIter = 1024
+maxIter = 100000
+zoom = (0.005)
 
-startReal = -1
-endReal = 1
+startReal = -zoom -- -2
+endReal = zoom --  0.47
 
-startIm = -1
-endIm = 1
+startIm = -zoom -- -1.12
+endIm = zoom     -- 1.12
 
+shiftReal = -0.745  --(-0.7463)
+shiftIm =  0.1 --(0.1102)
 
-width = 600
+width = 800
+height = 800
 
-height = width
-
-wSize = Size 600 600
-pallateSize = 3
+wSize = Size 800 800
+pallateSize = 30
 
 genPallate :: GLfloat -> [(GLfloat, GLfloat, GLfloat)]
-genPallate n = [((x*500/n),1,1) | x<- [1..n+1]]
+genPallate n = [((x*360/n),1,1) | x<- [1..n+1]]
 
 hsvPallate = genPallate pallateSize
 
@@ -43,68 +45,66 @@ hsvToRGB (h,s,v) | 0 <= hPrime && hPrime < 1 = calcRGB (c,x,0)
                 calcRGB (r1, g1, b1) = ((r1 + m), (g1 + m), (b1 + m))
 
 
-
-
-
 smoothColouring n z = n + 1 - log(logBase 2 z)
         
 
 vertex3f :: (GLfloat, GLfloat, GLfloat) -> IO ()
 vertex3f (x, y, z) = vertex $ Vertex3 x y z
 
+{-
 pointsList :: [(GLfloat, GLfloat, GLfloat)]
-pointsList = [ ((startReal + (x/width) * (endReal-startReal)),(startIm + (y/width) * (endIm-startIm)),0)    | x <- [0..width], y <- [0..height] ]
+pointsList = [ ((startReal + (x/width) * (endReal-startReal)),(startIm + (y/height) * (endIm-startIm)),0)    | x <- [0..width], y <- [0..height] ]
+-}
+
+scaledPoints :: [(GLfloat, GLfloat, GLfloat)]
+scaledPoints = [ (x,y,0)   | x <- [0..width], y <- [0..height] ]
+
+toComplex (x,y,z) = ((startReal + (x/width) * (endReal-startReal)),(startIm + (y/height) * (endIm-startIm)),0)
 
 
 mandelbrotCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> (GLfloat,GLfloat)
-mandelbrotCount (x0, y0, z0) x y iter | x*x + y*y <= 4 && iter < maxIter = mandelbrotCount (x0, y0, z0) (x*x - y*y + x0 -0.5) (2*x*y + y0) (iter + 1)
+mandelbrotCount (x0, y0, z0) x y iter | x*x + y*y <= 4 && iter < maxIter = mandelbrotCount (x0, y0, z0) (x*x - y*y + x0+ shiftReal) (2*x*y + y0 + shiftIm) (iter + 1)
                                       | otherwise = (iter,sqrt(x*x + y*y))
 
 
 
 juliaCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> (GLfloat, GLfloat)
-juliaCount (x0, y0, z0) x y iter | x0 * x0 + y0 * y0 <= 2*2 && iter < maxIter = juliaCount ((x0 * x0 - y0 * y0 + x ), (2*x0*y0 + y), 0) x y (iter + 1)
+juliaCount (x0, y0, z0) x y iter | x0 * x0 + y0 * y0 <= 4 && iter < maxIter = juliaCount ((x0 * x0 - y0 * y0 + x ), (2*x0*y0 + y), 0) x y (iter + 1)
                          | otherwise = (iter,sqrt(x0*x0 + y0*y0))
 
-
-tricornCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> (GLfloat, GLfloat)
-tricornCount (x0, y0, z0) x y iter | (p*p + q*q) <= 4 && (x*x + y*y) <= 4 && iter <= maxIter = tricornCount (x0,y0,z0) (x*x - y*y + x0) (-2*x*y + y0) (iter + 1)
-                                   | otherwise = (iter,sqrt(x*x + y*y) )
-                  where 
-                    p = x0
-                    q = y0
-
-
-{-
-n = 2
-
-multibrotCount :: (GLfloat, GLfloat, GLfloat) -> GLfloat -> GLfloat -> GLfloat -> (GLfloat,GLfloat)
-multibrotCount (x0, y0, z0) x y iter | x*x + y*y <= 4 && iter < maxIter = multibrotCount (x0, y0, z0) (x**3-3*x*y**2) (3*x**2*y-y**3) (iter + 1)
-                                      | otherwise = (iter,sqrt(x*x + y*y))
--}
 
 
 
 -- chooses the function to plot and the starting values
 
-fn = juliaCount
-c1 = 0.28
-c2 = 0.008
+fn = mandelbrotCount
 
+c1 = 0
+c2 = 0
+
+--c1 = 0.28
+--c2 = 0.008
+
+--c1 = -0.162
+--c2 = 1.04
+
+--c1 = -0.79
+--c2 = 0.15
 
 --douady rabbit
 --c1 = -0.1226
 --c2 = -0.7449
 
+--toComplex 
 
 --colours points in the that go to infinity black and other 
 
 plotColour :: (GLfloat, GLfloat, GLfloat) -> IO ()
-plotColour pnt = plot (fn pnt c1 c2 0)
+plotColour pnt = plot (fn (toComplex(pnt)) c1 c2 0)
               where 
               plot :: (GLfloat,GLfloat) -> IO ()
               plot (n,z) = do
-                print(n)
+                --print(n)
                 let action |n == maxIter = do
                                 currentColor $= Color4 0 0 0 1
                                 renderPrimitive Points $
@@ -116,21 +116,23 @@ plotColour pnt = plot (fn pnt c1 c2 0)
                                
                                 
                                 --1. smooth colouring
-                                let val = hsvToRGB ((smoothVal*360/75), 1, 1)
+                                let val = hsvToRGB ((smoothVal*360/1000), 1, 1)
                                  
                                 --2. HSV colouring
                                 --let val = hsvToRGB ((((n*360/75)**1.5)`mod'` 360),1,1)
 
-                                --3. pallete coloruing
+                                --3. pallete coloruing best for large zooms
                                 --let val =(hsvToRGB(hsvPallate !! floor(n `mod'`pallateSize)))
 
                                 currentColor $= Color4  ((chooseColour val !! 0 )) (chooseColour val !! 1) (chooseColour val !! 2) 1
                                 renderPrimitive Points $
-                                  vertex3f pnt 
+                                  vertex3f (scalePnt pnt) 
                                 
                                 where 
                                   chooseColour :: (GLfloat, GLfloat, GLfloat) -> [GLfloat]
                                   chooseColour (x,y,z) = [x,y,z]
+                                  scalePnt (x,y,z) = (((x-(width/2))/(width/2)), ((y-(height/2))/(height/2)), z)
+                                  
                               
                       
                                   
@@ -140,9 +142,16 @@ main :: IO ()
 main = do
   (_progName, _args) <- getArgsAndInitialize
   window "test"
-  --print (pointsList)
+  --print ( pointsList == (pointsTest scaledPoints))
   clearColor $= Color4 0 0 0 1
+  projection (0) 0 (0) 0 (0) 0
   mainLoop
+
+projection xl xu yl yu zl zu = do 
+  matrixMode $= Projection
+  loadIdentity
+  ortho xl xu yl yu zl zu
+  matrixMode $= Modelview 0
 
 window name = do
   createWindow name 
@@ -154,14 +163,14 @@ display :: DisplayCallback
 display = do
   clear [ ColorBuffer ]
   currentColor $= Color4 0 0 0 1
-  repeatNtimes (length pointsList) 0
+  repeatNtimes (length scaledPoints) 0
   flush
 
 --not a loop--
 
 repeatNtimes 0 x = return ()
 repeatNtimes iter x = do
-   plotColour (pointsList !! x)
+   plotColour (scaledPoints !! x)
    repeatNtimes (iter-1) (x+1)
 
 ----REFERENCES----
@@ -171,6 +180,7 @@ https://www.cs.hs-rm.de/~panitz/hopengl/skript.html#tth_sEc1.1
 https://wiki.haskell.org/OpenGLTutorial1
 https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set
 https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB
+http://www.cuug.ab.ca/dewara/mandelbrot/Mandelbrowser.html
 -}
 
 
