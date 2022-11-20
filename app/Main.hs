@@ -17,8 +17,8 @@ shiftIm = 0.12172418
 -}
                                                    
 --the greater the zoom, the greater maxIter should be--
-maxIter =  2500
-zoom = 1*(10**(-4)) --0.0005
+maxIter =  1500
+zoom = 0.0006 --0.0005
 
 startReal = -zoom -- -2
 endReal = zoom --  0.47
@@ -26,8 +26,8 @@ endReal = zoom --  0.47
 startIm = -zoom -- -1.12
 endIm = zoom     -- 1.12
 
-shiftReal = -0.74453892     -- -0.722    --0.26            --(-0.7463)
-shiftIm = 0.12172418        -- 0.246     ---0.0017           --(0.1102)
+shiftReal = -0.7445366   -- -0.722    --0.26            --(-0.7463)
+shiftIm = 0.1217208       -- 0.246     ---0.0017           --(0.1102)
 
 width = 300
 height = 300
