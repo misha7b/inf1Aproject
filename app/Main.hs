@@ -4,9 +4,9 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Data.Fixed
 
-
-maxIter = 100000
-zoom = (0.005)
+--the greater the zoom, the greater maxIter should be--
+maxIter =  2500
+zoom = 1*(10**(-4)) --0.0005
 
 startReal = -zoom -- -2
 endReal = zoom --  0.47
@@ -14,13 +14,13 @@ endReal = zoom --  0.47
 startIm = -zoom -- -1.12
 endIm = zoom     -- 1.12
 
-shiftReal = -0.745  --(-0.7463)
-shiftIm =  0.1 --(0.1102)
+shiftReal = -0.74453892     -- -0.722    --0.26            --(-0.7463)
+shiftIm = 0.12172418        -- 0.246     ---0.0017           --(0.1102)
 
-width = 800
-height = 800
+width = 300
+height = 300
 
-wSize = Size 800 800
+wSize = Size 300 300
 pallateSize = 30
 
 genPallate :: GLfloat -> [(GLfloat, GLfloat, GLfloat)]
@@ -45,7 +45,7 @@ hsvToRGB (h,s,v) | 0 <= hPrime && hPrime < 1 = calcRGB (c,x,0)
                 calcRGB (r1, g1, b1) = ((r1 + m), (g1 + m), (b1 + m))
 
 
-smoothColouring n z = n + 1 - log(logBase 2 z)
+smoothColouring n z = n + 1 - (log(log(z)/log(2)))/log(2)
         
 
 vertex3f :: (GLfloat, GLfloat, GLfloat) -> IO ()
@@ -112,11 +112,11 @@ plotColour pnt = plot (fn (toComplex(pnt)) c1 c2 0)
                            
                            |otherwise = do
                                 
-                                let smoothVal = (smoothColouring n z)
-                               
+                                let smoothVal = (smoothColouring n z)/maxIter
+                                --print(smoothVal)
                                 
                                 --1. smooth colouring
-                                let val = hsvToRGB ((smoothVal*360/1000), 1, 1)
+                                let val = hsvToRGB ((smoothVal*360), 1, 1)
                                  
                                 --2. HSV colouring
                                 --let val = hsvToRGB ((((n*360/75)**1.5)`mod'` 360),1,1)
@@ -181,6 +181,7 @@ https://wiki.haskell.org/OpenGLTutorial1
 https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set
 https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB
 http://www.cuug.ab.ca/dewara/mandelbrot/Mandelbrowser.html
+http://www.mrob.com/pub/muency/seahorsevalley.html
 -}
 
 
