@@ -4,6 +4,18 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Data.Fixed
 
+
+{- Favourite Values
+
+--Seahorse--
+maxIter = 2500
+zoom = 1*(10**(-4))
+shiftReal = -0.74453892  
+shiftIm = 0.12172418  
+
+
+-}
+                                                   
 --the greater the zoom, the greater maxIter should be--
 maxIter =  2500
 zoom = 1*(10**(-4)) --0.0005
