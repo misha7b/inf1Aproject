@@ -5,7 +5,10 @@ import Graphics.UI.GLUT
 import Data.Fixed
 
 
-{- Examples
+--Select what set is being generated and the values
+
+
+{- mandelbrot examples
 
 --Seahorse--
 maxIter = 2500
@@ -13,17 +16,28 @@ zoom = 1*(10**(-4))
 shiftReal = -0.74453892  
 shiftIm = 0.12172418  
 
+--Spiral--
+maxIter = 1500
+zoom = 0.0006
+shiftReal = -0.7445366   
+shiftIm = 0.1217208   
+
+--Lightning--
+maxIter = 3500
+zoom = 4*10**(-5)
+shiftReal = -0.235125
+shiftIm = 0.827215
 
 -}
 
 --maximum number of escape iterations
 
-maxIter =  1500
+maxIter =  300
 
 --magnification level
 -- use values on the right for correctly scaled Mandelbrot set
 
-zoom = 0.0006 
+zoom = 1.5
 
 startReal = -zoom -- -2
 endReal = zoom --  0.47
@@ -31,15 +45,15 @@ endReal = zoom --  0.47
 startIm = -zoom -- -1.12
 endIm = zoom     -- 1.12
 
-shiftReal = -0.7445366   
-shiftIm = 0.1217208   
+shiftReal = 0
+shiftIm = 0
 
 --width and height of image
 
-width = 300
-height = 300
+width = 800
+height = 800
 
-wSize = Size 300 300
+wSize = Size 800 800
 
 --number of colours in the pallate
 
@@ -102,13 +116,16 @@ juliaCount (x0, y0, z0) x y iter | x0 * x0 + y0 * y0 <= 4 && iter < maxIter = ju
 
 -- chooses the function that is being plotted
 
-fn = mandelbrotCount --juliaCount
+fn = juliaCount --juliaCount
 
 --set of complex numbers used
 --use 0 for both to plot the mandelbrot set
 
-c1 = 0
-c2 = 0
+--c1 = 0
+--c2 = 0
+
+c1 = -0.4
+c2 = -0.6
 
 --c1 = 0.28
 --c2 = 0.008
@@ -198,8 +215,6 @@ https://www.cs.hs-rm.de/~panitz/hopengl/skript.html#tth_sEc1.1
 https://wiki.haskell.org/OpenGLTutorial1
 https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set
 https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB
-http://www.cuug.ab.ca/dewara/mandelbrot/Mandelbrowser.html
-http://www.mrob.com/pub/muency/seahorsevalley.html
 -}
 
 
