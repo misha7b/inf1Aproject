@@ -1,5 +1,14 @@
-To run, load Main.hs in Haskell and run the main function.
-This project uses the OpenGL and GLUT libraries.
+Written using Haskell
 
-Test images are in the testImg folder
-High resolution images are in the highresImg folder
+This program generates Mandelbrot and Julia sets.
+
+Example images in testImg and highresImg folders.
+
+
+
+Libraries used: OpenGL, GLUT
+
+For larger images, (eg. 800x800), rendering can take around 20 minutes.
+
+
+Contributers: Michael Belyaev s2288598
