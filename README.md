@@ -1,6 +1,9 @@
-Written using Haskell
 
-This program generates Mandelbrot and Julia sets.
+
+2022 inf1A Haskell Competiton Submission
+
+
+This project generates Mandelbrot and Julia sets.
 
 Example images in testImg and highresImg folders.
 
